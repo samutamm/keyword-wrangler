@@ -13,20 +13,47 @@ var Server = function(port) {
           'SELECT id, value, categoryID FROM keyword ORDER BY id',
           function(err, rows) {
             sendResponse(res, err, rows);
-          });
-      }
+          }
+        );
+    },
+    POST: function(req, res) {
+      req.onJson(function(err, newKeyword) {
+        if (err) {
+          console.log(err);
+          res.status.internalServerError(err);
+        } else {
+          console.log('Coming JSON: ' + newKeyword);
+          dbSession.query('INSERT INTO keyword (value, categoryID) VALUES (?, ?);',
+          [newKeyword.value, newKeyword.categoryID],
+          function (err, result) {
+            if (err) {
+              console.log(err);
+              res.status.internalServerError(err);
+            } else {
+              var id = dbSession.getLastInsertId();
+              console.log(id);
+              res.object({'status': 'ok', 'id': id}).send();
+            }
+          }
+          );
+        }
+
+      });
+    }
     });
 
-    server.route('/api/keywords/categories',
-      {
-        GET: function(req, res) {
-          dbSession.fetchAll(
-            'SELECT id, name FROM category ORDER BY id',
-            function(err, rows) {
-              sendResponse(res, err, rows);
-            });
-        }
-      });
+  server.route('/api/keywords/categories',
+    {
+      GET: function(req, res) {
+        dbSession.fetchAll(
+          'SELECT id, name FROM category ORDER BY id',
+          function(err, rows) {
+            sendResponse(res, err, rows);
+          });
+      }
+    }
+  );
+
   return server;
 }
 
