@@ -37,7 +37,8 @@ describe('The API', function() {
     };
 
     var keywordToAdd = function(index) {
-      return {'value': expected["_items"][index].value, 'categoryID': expected["_items"][index].categoryID};
+      return {'value': expected["_items"][index].value,
+              'categoryID': expected["_items"][index].categoryID};
     }
 
     async.series(
@@ -71,9 +72,50 @@ describe('The API', function() {
         }
       ],
       function(err, results) {
+        if(err) throw(err);
         request.get(
           {
             'url': 'http://localhost:8081/api/keywords/',
+            'json': true
+          },
+          function(err, res, body) {
+            expect(res.statusCode).toBe(200);
+            expect(body).toEqual(expected);
+            done();
+          }
+        );
+      }
+    );
+  });
+
+  it('should respond to a GET request at /api/keywords/categories/', function(done) {
+    var expected = {
+      "_items": [
+        {'id': 1, 'name': 'Vegetable'},
+        {'id': 2, 'name': 'Utility'}
+      ]
+    };
+
+    async.series(
+      [
+        function(callback) {
+          resetDatabase(dbSession, callback);
+        },
+        function(callback) {
+          dbSession.insert('category', {'name':'Vegetable'},
+          function(err) { callback(err)});
+        },
+        function(callback) {
+          dbSession.insert('category', {'name':'Utility'},
+          function(err) { callback(err)});
+        }
+      ],
+
+      function(err, results) {
+        if (err) throw(err);
+        request.get(
+          {
+            'url': 'http://localhost:8081/api/keywords/categories/',
             'json': true
           },
           function(err, res, body) {

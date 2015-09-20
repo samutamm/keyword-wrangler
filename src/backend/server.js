@@ -12,16 +12,31 @@ var Server = function(port) {
         dbSession.fetchAll(
           'SELECT id, value, categoryID FROM keyword ORDER BY id',
           function(err, rows) {
-            if (err) {
-              console.log(err);
-              res.status.internalServerError(err);
-            } else {
-              res.collection(rows).send();
-            }
+            sendResponse(res, err, rows);
           });
       }
     });
+
+    server.route('/api/keywords/categories',
+      {
+        GET: function(req, res) {
+          dbSession.fetchAll(
+            'SELECT id, name FROM category ORDER BY id',
+            function(err, rows) {
+              sendResponse(res, err, rows);
+            });
+        }
+      });
   return server;
+}
+
+function sendResponse(res ,err, rows) {
+  if (err) {
+    console.log(err);
+    res.status.internalServerError(err);
+  } else {
+    res.collection(rows).send();
+  }
 }
 
 module.exports = {'Server': Server};
