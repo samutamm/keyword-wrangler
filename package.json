@@ -4,7 +4,8 @@
   "description": "Keyword managing tool.",
   "main": "src/backend/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/jasmine-node --verbose --captureExceptions ./spec/"
+    "test": "KW_ENV=test ./node_modules/.bin/jasmine-node --verbose --captureExceptions ./spec/",
+    "start": "KW_ENV=dev node src/backend/index.js"
   },
   "author": "",
   "license": "ISC",
