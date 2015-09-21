@@ -64,7 +64,7 @@ var Server = function(port) {
       res.status.internalServerError(err);
     } else {
     dbSession.query('UPDATE keyword SET value = ?, categoryID = ? WHERE keyword.id = ?;',
-    [keyword.value, keyword.categoryID, keywordId], 
+    [keyword.value, keyword.categoryID, keywordId],
     function (err, result) {
       if (err) {
       console.log(err);
@@ -75,6 +75,19 @@ var Server = function(port) {
     });
     }
     });
+  },
+
+    DELETE: function(req, res) {
+      var keywordId = req.uri.child();
+      dbSession.query('DELETE FROM keyword WHERE keyword.id = ?;', [keywordId],
+      function(err, result) {
+        if (err) {
+          console.log(err);
+          res.status.internalServerError(err);
+        } else {
+          res.object({'status': 'ok'}).send();
+        }
+      });
     }
   }
   );
